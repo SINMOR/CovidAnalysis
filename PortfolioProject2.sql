@@ -22,18 +22,18 @@ FROM NashvilleHousingData
 --|GETTING RID OF NULL VALUES |
 --populate property address data
 
-SELECT PropertyAddress
+SELECT PropertysplitAddress
 FROM NashvilleHousingData
----WHERE PropertyAddress IS NULL
+WHERE PropertysplitAddress IS NULL
 ORDER BY ParcelID
 
- SELECT a.ParcelID, a.PropertyAddress, b.ParcelID, b.PropertyAddress,ISNULL(a.PropertyAddress, b.PropertyAddress)
+ SELECT a.ParcelID, a.PropertysplitAddress, b.ParcelID, b.PropertysplitAddress,ISNULL(a.PropertysplitAddress, b.PropertysplitAddress)
  FROM NashvilleHousingData a
  JOIN NashvilleHousingData b ON a.ParcelID = b.ParcelID AND a.[UniqueID ] <> b.[UniqueID ]
- WHERE a.PropertyAddress is NULL
+ WHERE a.PropertysplitAddress is NULL
 
  UPDATE a 
- SET PropertyAddress = ISNULL(a.PropertyAddress, b.PropertyAddress)
+ SET PropertysplitAddress = ISNULL(a.PropertysplitAddress, b.PropertysplitAddress)
  FROM NashvilleHousingData a
  JOIN NashvilleHousingData b ON a.ParcelID = b.ParcelID AND a.[UniqueID ]<> b.[UniqueID ]
 
@@ -109,18 +109,18 @@ ORDER BY 2
 WITH Duplicates AS (
 SELECT *,
 ROW_NUMBER () OVER ( 
-  PARTITION BY ParcelID,PropertyAddress,SaleDate,saleprice,legalreference ORDER BY uniqueID) AS ROW_NUM
+  PARTITION BY ParcelID,saledateconverted,saleprice,legalreference ORDER BY uniqueID) AS ROW_NUM
 FROM NashvilleHousingData
 )
-SELECT *
+SELECT COUNT(*) as Duplicates
 FROM Duplicates
 WHERE ROW_NUM > 1
-order BY ParcelID
----There are 104 duplicate roes so we are going to delete 
+
+---There are 104 duplicate rows so we are going to delete 
 WITH Duplicates AS (
 SELECT *,
 ROW_NUMBER () OVER ( 
-  PARTITION BY ParcelID,PropertyAddress,SaleDate,saleprice,legalreference ORDER BY uniqueID) AS ROW_NUM
+  PARTITION BY ParcelID,SaleDate,saleprice,legalreference ORDER BY uniqueID) AS ROW_NUM
 FROM NashvilleHousingData
 )
 DELETE
